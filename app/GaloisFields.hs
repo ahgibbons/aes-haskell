@@ -114,12 +114,7 @@ pmod a m
     leadingA = countLeadingZeros a
 
 orbit :: Word8 -> [Word8]
-orbit n = 1 : orbit' (n)
- where
-   orbit' a
-     | a == 1 = []
-     | otherwise = a : orbit' (multGF2Word8 283 a n) 
-
+orbit n = (:) 1 . takeWhile (1/=) . iterate (multGF2Word8 283 n) $ n
 
 gf2Generator :: VS.Vector Word8
 gf2Generator = VS.fromList $ orbit 3

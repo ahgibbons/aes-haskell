@@ -11,6 +11,7 @@ import Tests (tkey,tiv)
 import Rjindael
 import Types
 import Block (cbcEncrypt, cbcDecrypt)
+--import Criterion.Main
 
 main :: IO ()
 main = do
@@ -24,4 +25,20 @@ main = do
                    "-d" ->  fromJust . cbcDecrypt AES128 tkey $ intext
     BS.writeFile outpath outtext
     putStrLn "Finished."
+
+
+{-main = defaultMain [
+           bgroup "orbit2" [ bench "10"  $ nf orbit2 10
+               , bench "17"  $ nf orbit2  17
+               , bench "111"  $ nf orbit2 111
+               , bench "244" $ nf orbit2 244
+               ],
+           bgroup "orbit" [ bench "10"  $ nf orbit 10
+               , bench "17"  $ nf orbit  17
+               , bench "111"  $ nf orbit 111
+               , bench "244" $ nf orbit 244
+               ]
+            
+  ]-}
+
 
