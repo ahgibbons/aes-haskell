@@ -9,6 +9,7 @@ import Data.Bits ((.&.),(.|.),xor)
 import Data.Char (intToDigit)
 import Data.Word
 import Data.Bits.ByteString
+import Control.Applicative (liftA2)
 import Data.List.Split (chunksOf)
 import qualified Data.Matrix as Mat
 
@@ -35,8 +36,7 @@ multParts n a b
   | otherwise = (n .&. a) * b : multParts (B.shiftL n 1) a b
 
 rotateByteStringL :: Int -> BS.ByteString -> BS.ByteString
-rotateByteStringL i bs = BS.append (BS.drop i bs) (BS.take i bs)
-
+rotateByteStringL i bs = BS.append (BS.drop i bs) (BS.take i bs) 
 
 inputToStateMatrix :: BS.ByteString -> Mat.Matrix Word8
 inputToStateMatrix bs = Mat.transpose . Mat.fromList 4 4 $ BS.unpack bs

@@ -99,7 +99,6 @@ invSubBytes = fmap invSubByte
 rotateList :: Int -> [a] -> [a]
 rotateList _ [] = []
 rotateList n xs = zipWith const (drop n (cycle xs)) xs
-
            
 shiftRows :: Mat.Matrix Word8 -> Mat.Matrix Word8
 shiftRows m = Mat.fromLists . zipWith rotateList [0..3] $ Mat.toLists m
