@@ -21,13 +21,13 @@ import Types
 import GaloisFields
 
 
-nb = 4 :: Int
+{- nb = 4 :: Int
 nk_128 = 4 :: Int
 nk_192 = 6 :: Int
 nk_256 = 8 :: Int
 nr_128 = 10 :: Int
 nr_192 = 12 :: Int
-nr_256 = 14 :: Int
+nr_256 = 14 :: Int -}
 
 
 multParts :: Int -> Int -> Int -> [Int]

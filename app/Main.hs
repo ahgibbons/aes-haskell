@@ -6,7 +6,6 @@ import System.Environment (getArgs)
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString as BS
 import Data.Maybe (fromJust)
-import Data.HexString
 
 import Tests (tkey,tiv)
 import Rjindael
