@@ -51,12 +51,6 @@ Right c1_plaintext  = BS16.decode "00112233445566778899aabbccddeeff"
 Right c1_key        = BS16.decode "000102030405060708090a0b0c0d0e0f"
 c1_ciphertext = "69c4e0d86a7b0430d8cdb78070b4c55a" :: BS.ByteString
 
-c1_aeskey = makeKey AES128 c1_key
-
-ct_1 = fmap BS16.encode $ encryptAES AES128 <$> expandKey nk_128 nb nr_128 <$> BS.unpack 
-                         <$> getkey <$> c1_aeskey <*> pure c1_plaintext
-
-c1_test = ct_1 == Right c1_ciphertext
 
 -- 192-bit key
 Right c2_plaintext  = BS16.decode "00112233445566778899aabbccddeeff"
