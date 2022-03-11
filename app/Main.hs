@@ -5,7 +5,7 @@ module Main where
 import System.Environment (getArgs)
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString as BS
-import Data.Maybe (fromJust)
+import Data.Either (fromRight)
 
 import Tests (tkey,tiv)
 import Rjindael
@@ -13,6 +13,9 @@ import Types
 import Block (cbcEncrypt, cbcDecrypt)
 
 --import Criterion.Main
+
+-- Ideal usage
+-- ecbEncrypt key plaintext
 
 main :: IO ()
 main = do
@@ -23,7 +26,7 @@ main = do
     intext <- BS.readFile fpath
     let outtext = case flag of 
                    "-e" ->  cbcEncrypt AES128 tiv tkey intext 
-                   "-d" ->  fromJust . cbcDecrypt AES128 tkey $ intext
+                   "-d" ->  fromRight "" . cbcDecrypt AES128 tkey $ intext
     BS.writeFile outpath outtext
     putStrLn "Finished."
 

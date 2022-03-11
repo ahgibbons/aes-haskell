@@ -9,9 +9,18 @@ nr_128 = 10 :: Int
 nr_192 = 12 :: Int
 nr_256 = 14 :: Int
 
-
-
+type Rounds    = Int
+type BlockSize = Int
+type KeySize   = Int
 type IV = BS.ByteString
+
+
+aesparams :: AES -> (KeySize, BlockSize, Rounds)
+aesparams AES128 = (nk_128, nb, nr_128)
+aesparams AES192 = (nk_192, nb, nr_192)
+aesparams AES256 = (nk_256, nb, nr_256)
+
+
 
 data AES = AES128 | AES192 | AES256 deriving (Show,Eq)
 data AESKey = Key128 Key | Key192 Key | Key256 Key deriving (Show, Eq)

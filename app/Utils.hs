@@ -60,7 +60,10 @@ rconTable = V.fromList [ 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40
             , 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d]
 
 
-
+isValidKey :: AES -> Key -> Bool
+isValidKey AES128 k = BS.length k == nb*nk_128
+isValidKey AES192 k = BS.length k == nb*nk_192
+isValidKey AES256 k = BS.length k == nb*nk_256
 
 rcon_baked :: VS.Vector Word8
 rcon_baked = $$(bake rcon_vector)
@@ -144,10 +147,10 @@ pkcs7 blocksize bs = BS.append bs . BS.replicate n . fromIntegral $ n
   where
     n = fromIntegral blocksize - (BS.length bs `mod` fromIntegral blocksize)
 
-unpkcs7 :: BS.ByteString -> Maybe BS.ByteString
+unpkcs7 :: BS.ByteString -> Either String BS.ByteString
 unpkcs7 bs = if (BS.all (==last') pad)
-             then Just text
-             else Nothing
+             then Right text
+             else Left "Invalid padding"
   where
     len        = BS.length bs
     last'      = BS.last bs
