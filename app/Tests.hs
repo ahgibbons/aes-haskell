@@ -63,6 +63,15 @@ Right c3_plaintext  = BS16.decode "00112233445566778899aabbccddeeff"
 Right c3_key        = BS16.decode "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
 c3_ciphertext = "8ea2b7ca516745bfeafc49904b496089" :: BS.ByteString
 
+-----
+--- CBC Test Vectors
+-----
+
+Right key = BS16.decode "06a9214036b8a15b512e03d534120006"
+Right iv  = BS16.decode "3dafba429d9eb430b422da802c9fac41"
+plaintext = "Single block msg" :: BS.ByteString
+ciphertext =  BS16.decode "e353779c1079aeb82708942dbe77181a"
+
 tiv :: BS.ByteString
 tiv = "0123456789abcdef"
 

@@ -36,7 +36,7 @@ ecbDec aes key ctext
 
 -- Cipher Block Chaining Mode (CBC). Considered secure, but cannot be run in parallel.
 cbcEncrypt :: AES -> IV -> Key -> PlainText -> CipherText
-cbcEncrypt aestype iv key ptext = BS.concat ctext'
+cbcEncrypt aestype iv key ptext = mconcat ctext'
   where
     roundKeys = case aestype of 
                   AES128 -> expandKey nk_128 nb nr_128 (BS.unpack key)
@@ -54,4 +54,3 @@ cbcDecrypt aestype key ctext = unpkcs7 $ BS.concat ptext'
                   AES256 -> reverse $ expandKey nk_256 nb nr_256 (BS.unpack key)
     ctext' = chunksOfBS blocksize ctext
     ptext' = zipWith (\ca cb -> xor (decryptAES aestype roundKeys cb) ca) ctext' (tail ctext')
-    

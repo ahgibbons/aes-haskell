@@ -13,18 +13,13 @@ type Rounds    = Int
 type BlockSize = Int
 type KeySize   = Int
 type IV = BS.ByteString
-
-
-aesparams :: AES -> (KeySize, BlockSize, Rounds)
-aesparams AES128 = (nk_128, nb, nr_128)
-aesparams AES192 = (nk_192, nb, nr_192)
-aesparams AES256 = (nk_256, nb, nr_256)
-
-
-
-data AES = AES128 | AES192 | AES256 deriving (Show,Eq)
-
 type PlainText = BS.ByteString
 type Key = BS.ByteString
 type CipherText = BS.ByteString
 
+
+data AES = AES128 | AES192 | AES256 deriving (Show,Eq)
+aesparams :: AES -> (KeySize, BlockSize, Rounds)
+aesparams AES128 = (nk_128, nb, nr_128)
+aesparams AES192 = (nk_192, nb, nr_192)
+aesparams AES256 = (nk_256, nb, nr_256)
