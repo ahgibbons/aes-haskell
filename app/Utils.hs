@@ -147,6 +147,7 @@ pkcs7 blocksize bs = BS.append bs . BS.replicate n . fromIntegral $ n
   where
     n = fromIntegral blocksize - (BS.length bs `mod` fromIntegral blocksize)
 
+
 unpkcs7 :: BS.ByteString -> Either String BS.ByteString
 unpkcs7 bs = if (BS.all (==last') pad)
              then Right text
@@ -155,6 +156,9 @@ unpkcs7 bs = if (BS.all (==last') pad)
     len        = BS.length bs
     last'      = BS.last bs
     (text,pad) = BS.splitAt (len - (fromIntegral last')) bs
+
+unpad :: BS.ByteString -> Either String BS.ByteString
+unpad = unpkcs7
 
 justWhen :: (a -> Bool) -> (a -> b) -> (a -> Maybe b)
 justWhen f g a = if f a then Just (g a) else Nothing

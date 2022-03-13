@@ -17,6 +17,7 @@ type PlainText = BS.ByteString
 type Key = BS.ByteString
 type CipherText = BS.ByteString
 
+data Pad = NoPad | PKCS7 deriving (Show, Eq)
 
 data AES = AES128 | AES192 | AES256 deriving (Show,Eq)
 aesparams :: AES -> (KeySize, BlockSize, Rounds)

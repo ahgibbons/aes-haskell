@@ -7,17 +7,20 @@ import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString as BS
 import Data.Either (fromRight)
 
-import Tests (tkey,tiv)
+import Tests
 import Rjindael
 import Types
-import Block (cbcEncrypt, cbcDecrypt)
+import Block
 
 --import Criterion.Main
 
 -- Ideal usage
--- ecbEncrypt key plaintext
+-- ecbEncrypt key plaintext\
 
 main :: IO ()
+main = putStrLn "Hello"
+
+{- main :: IO ()
 main = do
     args <- getArgs
     let flag    = args !! 0
@@ -28,7 +31,7 @@ main = do
                    "-e" ->  cbcEncrypt AES128 tiv tkey intext 
                    "-d" ->  fromRight "" . cbcDecrypt AES128 tkey $ intext
     BS.writeFile outpath outtext
-    putStrLn "Finished."
+    putStrLn "Finished." -}
 
 
 {-main = defaultMain [
