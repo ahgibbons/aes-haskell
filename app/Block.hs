@@ -63,3 +63,13 @@ cbcDec aes pad key iv ctext
                     ptext' = mconcat . zipWith decstep (iv : ctext') $ ctext'
                 in case pad of NoPad -> Right ptext'
                                PKCS7 -> unpkcs7 ptext'
+
+---  Galois Counter Block Mode
+--gcEnc :: AES -> Key -> IV -> AAD -> PlainText 
+--      -> (CipherText, AuthTag)
+
+
+
+--gcDec :: AES -> Key -> IV -> AAD -> CipherText ->
+--          AuthTag -> Maybe PlainText
+

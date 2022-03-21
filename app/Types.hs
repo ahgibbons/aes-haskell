@@ -16,6 +16,10 @@ type IV = BS.ByteString
 type PlainText = BS.ByteString
 type Key = BS.ByteString
 type CipherText = BS.ByteString
+type AAD = BS.ByteString
+type AuthTag = BS.ByteString
+
+type CounterFunc = Int -> BS.ByteString
 
 data Pad = NoPad | PKCS7 deriving (Show, Eq)
 

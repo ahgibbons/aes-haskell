@@ -45,3 +45,7 @@ Right c6_key = BS16.decode "56e47a38c5598974bc46903dba290349"
 Right c6_iv  = BS16.decode"8ce82eefbea0da3c44699ed7db51b7d9"
 Right c6_plaintext = BS16.decode "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
 ciphertext =  "c30e32ffedc0774e6aff6af0869f71aa0f3af07a9a31a9c684db207eb0ef8e4e35907aa632c3ffdf868bb7b29d3d46ad83ce9f9a102ee99d49a53e87f4c3da55" :: BS.ByteString
+
+
+-----
+-- CTR 
