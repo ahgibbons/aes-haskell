@@ -14,7 +14,6 @@ To run (for example after using `cabal build`)
 
 `cabal run aes -- ARGS`
 
-**Note: Only 128 bit encryption is available when running from the command line**
 
 Command line arguments:
 
@@ -32,6 +31,7 @@ Available options:
   --mode BLOCKMODE         Block cipher mode, ecb or cbc
   --keyfile KEY            Path to key file.
   --ivfile IV              Path to IV value.
+  --keylen KEYLEN          AES key length (128 (default) or 192 or 256)
   -h,--help                Show this help text
 ```
   
