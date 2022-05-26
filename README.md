@@ -34,7 +34,7 @@ Available options:
   --keylen KEYLEN          AES key length (128 (default) or 192 or 256)
   -h,--help                Show this help text
 ```
-  
+ 
 As an example, to encrypt a file using CBC mode where the key is in `keyfile.key` and the iv is in `iv.iv`:
   
 `cabal run aes -- --infile plaintext.bin --outfile ciphertext.aes --mode cbc --keyfile keyfile.key --ivfile iv.iv`
@@ -42,3 +42,10 @@ As an example, to encrypt a file using CBC mode where the key is in `keyfile.key
 To decrypt this file:
 
 `cabal run aes -- -d --infile ciphertext.aes --outfile plaintext_out.bin --mode cbc --keyfile keyfile.key --ivfile iv.iv`
+
+## Wishlist
+
+* Add counter block mode
+* Add Galois counter block mode
+* Include a key derivation function to allow user passwords instead of a key file
+* Create randomly generated IVs for cbc mode
