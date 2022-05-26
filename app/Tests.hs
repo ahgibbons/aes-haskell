@@ -4,43 +4,7 @@ module Tests where
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Base16 as BS16 (encode, decode)
 
-import KeyExpansion (expandKey)
-import Rjindael (encryptAES)
-import Block
 import Types
-
-
-tinput :: BS.ByteString
-tinput = BS.pack [0x32,0x43,0xf6,0xa8
-         ,0x88,0x5a,0x30,0x8d
-         ,0x31,0x31,0x98,0xa2
-         ,0xe0,0x37,0x07,0x34]
-
-tkey = BS.pack [0x2b,0x7e,0x15,0x16
-       ,0x28,0xae,0xd2,0xa6
-       ,0xab,0xf7,0x15,0x88
-       ,0x09,0xcf,0x4f,0x3c]
-
-tkey_128 = BS.pack [0x2b,0x7e,0x15,0x16
-       ,0x28,0xae,0xd2,0xa6
-       ,0xab,0xf7,0x15,0x88
-       ,0x09,0xcf,0x4f,0x3c]
-
-tkey_192 = BS.pack [0x8e,0x73,0xb0,0xf7
-           ,0xda,0x0e,0x64,0x52
-           ,0xc8,0x10,0xf3,0x2b
-           ,0x80,0x90,0x79,0xe5
-           ,0x62,0xf8,0xea,0xd2
-           ,0x52,0x2c,0x6b,0x7b]
-
-tkey_256 = BS.pack [0x60,0x3d,0xeb,0x10
-           ,0x15,0xca,0x71,0xbe
-           ,0x2b,0x73,0xae,0xf0
-           ,0x85,0x7d,0x77,0x81
-           ,0x1f,0x35,0x2c,0x07
-           ,0x3b,0x61,0x08,0xd7
-           ,0x2d,0x98,0x10,0xa3
-           ,0x09,0x14,0xdf,0xf4]
 
 -- Examples are from NIST, FIPS 197
 -- Below are tests confirming that the AES cipher works as expected.
@@ -64,15 +28,24 @@ Right c3_key        = BS16.decode "000102030405060708090a0b0c0d0e0f1011121314151
 c3_ciphertext = "8ea2b7ca516745bfeafc49904b496089" :: BS.ByteString
 
 -----
---- CBC Test Vectors
+--- CBC Test Vectors (AES128, no padding), From RFC 3602
 -----
 
-Right key = BS16.decode "06a9214036b8a15b512e03d534120006"
-Right iv  = BS16.decode "3dafba429d9eb430b422da802c9fac41"
-plaintext = "Single block msg" :: BS.ByteString
-ciphertext =  BS16.decode "e353779c1079aeb82708942dbe77181a"
+Right c4_key = BS16.decode "06a9214036b8a15b512e03d534120006"
+Right c4_iv  = BS16.decode "3dafba429d9eb430b422da802c9fac41"
+c4_plaintext = "Single block msg" :: BS.ByteString
+c4_ciphertext =  BS16.decode "e353779c1079aeb82708942dbe77181a"
 
-tiv :: BS.ByteString
-tiv = "0123456789abcdef"
+Right c5_key = BS16.decode "c286696d887c9aa0611bbb3e2025a45a"
+Right c5_iv  = BS16.decode "562e17996d093d28ddb3ba695a2e6f58"
+Right c5_plaintext = BS16.decode "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+c5_ciphertext = "d296cd94c2cccf8a3a863028b5e1dc0a7586602d253cfff91b8266bea6d61ab1" :: BS.ByteString
 
-longText = "Hello World. This is an AES example." :: BS.ByteString
+Right c6_key = BS16.decode "56e47a38c5598974bc46903dba290349"
+Right c6_iv  = BS16.decode"8ce82eefbea0da3c44699ed7db51b7d9"
+Right c6_plaintext = BS16.decode "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
+ciphertext =  "c30e32ffedc0774e6aff6af0869f71aa0f3af07a9a31a9c684db207eb0ef8e4e35907aa632c3ffdf868bb7b29d3d46ad83ce9f9a102ee99d49a53e87f4c3da55" :: BS.ByteString
+
+
+-----
+-- CTR 

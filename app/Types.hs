@@ -16,7 +16,14 @@ type IV = BS.ByteString
 type PlainText = BS.ByteString
 type Key = BS.ByteString
 type CipherText = BS.ByteString
+type AAD = BS.ByteString
+type AuthTag = BS.ByteString
 
+data BockMode = ECB | CBC
+
+type CounterFunc = Int -> BS.ByteString
+
+data Pad = NoPad | PKCS7 deriving (Show, Eq)
 
 data AES = AES128 | AES192 | AES256 deriving (Show,Eq)
 aesparams :: AES -> (KeySize, BlockSize, Rounds)

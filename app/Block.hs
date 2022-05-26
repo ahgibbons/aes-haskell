@@ -5,6 +5,8 @@ module Block where
 import Data.List.Split (chunksOf)
 import Data.Bits (xor)
 import qualified Data.ByteString as BS
+import qualified Data.Matrix as M
+import qualified Data.Word as W
 
 import Rjindael
 import KeyExpansion (expandKey)
@@ -14,6 +16,7 @@ import Types
 
 
 -- Electronic CodeBook Mode. Not recommended for actual use. 
+-- This assumes that PKCS7 padding will be used.
 ecbEnc :: AES -> Key -> PlainText -> Either String CipherText
 ecbEnc aes key ptext
   | isValidKey aes key = let (nk, nb, nr) = aesparams aes
@@ -31,26 +34,42 @@ ecbDec aes key ctext
                              ctext' = chunksOfBS blocksize ctext
                              ptext' = map (decryptAES aes roundKeys) ctext'
                          in unpkcs7 $ mconcat ptext'
-  | otherwise       = Left "Incorrect key length"
+  | otherwise          = Left "Incorrect key length"
 
 
 -- Cipher Block Chaining Mode (CBC). Considered secure, but cannot be run in parallel.
-cbcEncrypt :: AES -> IV -> Key -> PlainText -> CipherText
-cbcEncrypt aestype iv key ptext = mconcat ctext'
-  where
-    roundKeys = case aestype of 
-                  AES128 -> expandKey nk_128 nb nr_128 (BS.unpack key)
-                  AES192 -> expandKey nk_192 nb nr_192 (BS.unpack key)
-                  AES256 -> expandKey nk_256 nb nr_256 (BS.unpack key)
-    ptext' = chunksOfBS blocksize . pkcs7 blocksize $ ptext
-    ctext' = scanl (\c0 c1 -> encryptAES aestype roundKeys (xor c0 c1)) iv ptext'
+cbcEnc :: AES -> Pad -> Key -> IV -> PlainText -> Either String CipherText
+cbcEnc aes pad key iv ptext
+  | not $ isValidKey aes key    = Left "Incorrect key length"
+  | BS.length iv /= blocksize   = Left "Incorrect IV size"
+  | (BS.length ptext `mod` blocksize) /= 0  
+                && pad == NoPad = Left "Plain text is not a multiple of 16-bytes in size, and no padding."
+  | otherwise     = let (nk, nb, nr) = aesparams aes
+                        roundKeys = expandKey nk nb nr (BS.unpack key)
+                        ptext' = chunksOfBS blocksize $ case pad of NoPad -> ptext
+                                                                    PKCS7 -> pkcs7 blocksize ptext
+                        cbcstep pt ct = (encryptAES aes roundKeys) (pt `xor` ct) 
+                    in Right . mconcat . tail . scanl cbcstep iv $ ptext'
 
-cbcDecrypt :: AES -> Key -> CipherText -> Either String PlainText
-cbcDecrypt aestype key ctext = unpkcs7 $ BS.concat ptext'
-  where
-    roundKeys = case aestype of 
-                  AES128 -> reverse $ expandKey nk_128 nb nr_128 (BS.unpack key)
-                  AES192 -> reverse $ expandKey nk_192 nb nr_192 (BS.unpack key)
-                  AES256 -> reverse $ expandKey nk_256 nb nr_256 (BS.unpack key)
-    ctext' = chunksOfBS blocksize ctext
-    ptext' = zipWith (\ca cb -> xor (decryptAES aestype roundKeys cb) ca) ctext' (tail ctext')
+cbcDec :: AES -> Pad -> Key -> IV -> CipherText -> Either String PlainText
+cbcDec aes pad key iv ctext
+  | not $ isValidKey aes key    = Left "Incorrect key length"
+  | BS.length iv /= blocksize   = Left "Incorrect IV size"
+  | (BS.length ctext `mod` blocksize) /= 0  = Left "Cipher text is not a multiple of 16-bytes in size"
+  | otherwise = let (nk, nb, nr) = aesparams aes
+                    roundkeys = reverse $ expandKey nk nb nr (BS.unpack key)
+                    ctext' = chunksOfBS blocksize ctext
+                    decstep ct0 ct1 = ct0 `xor` (decryptAES aes roundkeys ct1)
+                    ptext' = mconcat . zipWith decstep (iv : ctext') $ ctext'
+                in case pad of NoPad -> Right ptext'
+                               PKCS7 -> unpkcs7 ptext'
+
+---  Galois Counter Block Mode
+--gcEnc :: AES -> Key -> IV -> AAD -> PlainText 
+--      -> (CipherText, AuthTag)
+
+
+
+--gcDec :: AES -> Key -> IV -> AAD -> CipherText ->
+--          AuthTag -> Maybe PlainText
+
