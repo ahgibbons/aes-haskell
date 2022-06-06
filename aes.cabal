@@ -57,6 +57,7 @@ executable aes
                      , template-haskell
                      , ghc-prim
                      , optparse-applicative
+                     , binary
                       
     hs-source-dirs:   app
     default-language: Haskell2010

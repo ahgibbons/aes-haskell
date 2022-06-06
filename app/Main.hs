@@ -18,12 +18,13 @@ import Block
 main :: IO ()
 main = runEncrypter =<< execParser opts
   where
-    opts = info (mainparser <**> helper)
+    opts = info (commandlineParser <**> helper)
       ( fullDesc
-     <> progDesc "Encrypt a file using AES (ECB or CBC mode)"
+     <> progDesc "Encrypt a file using AES (ECB, CBC or CTR mode)"
      <> header "AES Encrypt" )
 
-
+-- Data types for commandline arguments
+data EncDec = Encrypt | Decrypt deriving (Show, Eq)
 data AESArguments = AESArguments 
                 {infile_     :: FilePath,
                 outfile_     :: FilePath,
@@ -35,10 +36,8 @@ data AESArguments = AESArguments
                 } deriving (Show, Eq)
 
 
-data EncDec = Encrypt | Decrypt deriving (Show, Eq)
-
-mainparser :: Parser AESArguments
-mainparser = AESArguments
+commandlineParser :: Parser AESArguments
+commandlineParser = AESArguments
       <$> strOption
           ( long "infile"
          <> metavar "INFILE"
@@ -54,7 +53,7 @@ mainparser = AESArguments
       <*> strOption
           ( long "mode"
          <> metavar "BLOCKMODE"
-         <> help "Block cipher mode, ecb or cbc")
+         <> help "Block cipher mode, 'ecb', 'cbc' or 'ctr'")
       <*> strOption
           ( long "keyfile"
          <> metavar "KEY"
@@ -70,19 +69,7 @@ mainparser = AESArguments
          <> value "128"
          <> help "AES key length (128 (default) or 192 or 256)")
 
-encrypter :: AES -> Key -> PlainText -> String 
-          -> Maybe IV -> Either String CipherText 
-encrypter aesmode key ptext bmode iv'
-    | bmode == "ecb" = ecbEnc aesmode key ptext
-    | bmode == "cbc" = cbcEnc aesmode PKCS7 key (fromJust iv') ptext
-    | otherwise      = error "Invalid block mode."
 
-decrypter :: AES -> Key -> Maybe IV -> CipherText 
-          -> String -> Either String PlainText
-decrypter aesmode key iv' ctext bmode
-    | bmode == "ecb" = ecbDec aesmode key ctext
-    | bmode == "cbc" = cbcDec aesmode PKCS7 key (fromJust iv') ctext
-    | otherwise      = error "Invalid block mode." 
 
 runEncrypter :: AESArguments -> IO ()
 runEncrypter args = do
@@ -92,8 +79,13 @@ runEncrypter args = do
 
     key    <- BS.readFile $ keyfile_ args
 
-    iv     <- if mode=="cbc" then (fmap Just . BS.readFile $ ivfile_ args)
-                          else (return Nothing)
+    iv     <- case mode of
+                "cbc" -> fmap Just . BS.readFile $ infile_ args
+                "ctr" -> fmap Just . BS.readFile $ infile_ args
+                otherwise -> return Nothing
+
+    {-iv     <- if mode=="cbc" then (fmap Just . BS.readFile $ ivfile_ args)
+                          else (return Nothing)-}
     intext <- BS.readFile $ infile_ args
     let keylen = case keylen_ args of
                     "128" -> AES128
@@ -101,11 +93,29 @@ runEncrypter args = do
                     "256" -> AES256
                     _     -> error "Invalid key length." 
 
-
     let otext = case encf of 
-                    Decrypt -> decrypter keylen key iv intext mode 
+                    Decrypt -> decrypter keylen key intext mode iv
                     Encrypt -> encrypter keylen key intext mode iv
     case otext of
         Left s -> do putStrLn "Error!"
                      putStrLn s
         Right a -> BS.writeFile ofile a 
+
+
+--General encryption function
+encrypter :: AES -> Key -> PlainText -> String 
+          -> Maybe IV -> Either String CipherText 
+encrypter aesmode key ptext bmode iv'
+    | bmode == "ecb" = ecbEnc aesmode key ptext
+    | bmode == "cbc" = cbcEnc aesmode PKCS7 key (fromJust iv') ptext
+    | bmode == "ctr" = ctrEncDec aesmode key (BS.take 4 $ fromJust iv') (BS.drop 4 $ fromJust iv') ptext
+    | otherwise      = error "Invalid block mode."
+
+--General decryption function
+decrypter :: AES -> Key -> CipherText -> String 
+          -> Maybe IV -> Either String PlainText
+decrypter aesmode key ctext bmode iv'
+    | bmode == "ecb" = ecbDec aesmode key ctext
+    | bmode == "cbc" = cbcDec aesmode PKCS7 key (fromJust iv') ctext
+    | bmode == "ctr" = ctrEncDec aesmode key (BS.take 4 $ fromJust iv') (BS.drop 4 $ fromJust iv') ctext
+    | otherwise      = error "Invalid block mode." 

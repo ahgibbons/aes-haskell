@@ -18,6 +18,7 @@ type Key = BS.ByteString
 type CipherText = BS.ByteString
 type AAD = BS.ByteString
 type AuthTag = BS.ByteString
+type Nonce = BS.ByteString
 
 data BockMode = ECB | CBC
 

@@ -5,6 +5,8 @@ module Block where
 import Data.List.Split (chunksOf)
 import Data.Bits (xor)
 import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as BL
+import Data.Binary.Put
 import qualified Data.Matrix as M
 import qualified Data.Word as W
 
@@ -63,6 +65,29 @@ cbcDec aes pad key iv ctext
                     ptext' = mconcat . zipWith decstep (iv : ctext') $ ctext'
                 in case pad of NoPad -> Right ptext'
                                PKCS7 -> unpkcs7 ptext'
+
+
+ctrEncDec :: AES -> Key -> Nonce -> IV -> PlainText -> Either String CipherText
+ctrEncDec aes key nonce iv ptext 
+  | not $ isValidKey aes key                        = Left "Incorrect key length"
+  | (BS.length iv /= 8) || (BS.length nonce /= 4) = Left "Incorrect Nonce or IV size"
+  | otherwise  = let (nk, nb, nr) = aesparams aes
+                     roundkeys = expandKey nk nb nr (BS.unpack key)
+                     ptext' = chunksOfBS blocksize ptext
+                     ctrbs = map (BS.concat . BL.toChunks . runPut . putWord32be) [1..]
+                     ctrhead = BS.concat [nonce, iv]
+                     ctrblocks = map (BS.append ctrhead) ctrbs
+                     ctext' = map (encryptAES aes roundkeys) ctrblocks
+                     ctext  = zipWith xor ptext' ctext'
+                in Right $ mconcat ctext
+
+{-ctrDec :: AES -> Pad -> Key -> Nonce -> IV -> CipherText -> Either String PlainText
+ctrDec aes pad key nonce iv ctext
+  | not $ isValidKey aes key    = Left "Incorrect key length"
+  | BS.length iv /= blocksize   = Left "Incorrect IV size"
+  | (BS.length ctext `mod` blocksize) /= 0  = Left "Cipher text is not a multiple of 16-bytes in size"
+  | otherwise   = let (nk, nb, nr) = aesparams aes-}
+
 
 ---  Galois Counter Block Mode
 --gcEnc :: AES -> Key -> IV -> AAD -> PlainText 
