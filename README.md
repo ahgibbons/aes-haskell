@@ -28,7 +28,7 @@ Available options:
   --infile INFILE          Path to file to encrypt/decrypt.
   --outfile OUTFILE        Path of output encrypted/decrypted file.
   -d,--decrypt             Set to decrypt (default encrypt)
-  --mode BLOCKMODE         Block cipher mode, ecb or cbc
+  --mode BLOCKMODE         Block cipher mode: ecb, cbc or ctr
   --keyfile KEY            Path to key file.
   --ivfile IV              Path to IV value.
   --keylen KEYLEN          AES key length (128 (default) or 192 or 256)
@@ -45,7 +45,6 @@ To decrypt this file:
 
 ## Wishlist
 
-* Add counter block mode
 * Add Galois counter block mode
 * Include a key derivation function to allow user passwords instead of a key file
 * Create randomly generated IVs for cbc mode
