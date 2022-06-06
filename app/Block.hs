@@ -81,13 +81,6 @@ ctrEncDec aes key nonce iv ptext
                      ctext  = zipWith xor ptext' ctext'
                 in Right $ mconcat ctext
 
-{-ctrDec :: AES -> Pad -> Key -> Nonce -> IV -> CipherText -> Either String PlainText
-ctrDec aes pad key nonce iv ctext
-  | not $ isValidKey aes key    = Left "Incorrect key length"
-  | BS.length iv /= blocksize   = Left "Incorrect IV size"
-  | (BS.length ctext `mod` blocksize) /= 0  = Left "Cipher text is not a multiple of 16-bytes in size"
-  | otherwise   = let (nk, nb, nr) = aesparams aes-}
-
 
 ---  Galois Counter Block Mode
 --gcEnc :: AES -> Key -> IV -> AAD -> PlainText 
